@@ -1,4 +1,4 @@
-CNN_INPUT_LENGTH = 256
+CNN_INPUT_LENGTH = 200
 
 CLASS_ID_TO_LABEL = {
     0: 'not pulsar',

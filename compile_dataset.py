@@ -13,11 +13,8 @@ from local_settings import TRAINING_DATA_DIR
 def main(dataset_npz_filepath):
 
     data = np.load(dataset_npz_filepath)
-    x = data['time_plots']
+    x = data['chi_vs_DM_plots']
     y = data['labels']
-
-    # Repeat the plot once so that the spikes split by the edge will get joined
-    x = np.hstack((x, x))
 
     retval = stratified_shuffle_split_for_binary(x, y, test_fraction=0.333)
     x_train, y_train, x_test, y_test = retval
