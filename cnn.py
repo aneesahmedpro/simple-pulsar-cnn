@@ -1,50 +1,50 @@
 import tensorflow as tf
 
-from config import CNN_INPUT_IMG_WIDTH, CNN_INPUT_IMG_HEIGHT
+from config import CNN_INPUT_LENGTH
 
 
 def cnn_model_fn(features, labels, mode, params):
 
-    input_shape = (-1, CNN_INPUT_IMG_HEIGHT, CNN_INPUT_IMG_WIDTH, 1)
+    input_shape = (-1, CNN_INPUT_LENGTH, 1)
     input_layer = tf.reshape(features['input'], input_shape)
 
-    # shape: (?, 64, 128, 1)
+    # shape: (?, 256, 1)
 
-    conv1 = tf.keras.layers.Conv2D(
+    conv1 = tf.keras.layers.Conv1D(
         filters=32,
         kernel_size=16,
         strides=1,
         padding='same',
         activation=tf.keras.activations.relu)(input_layer)
 
-    # shape: (?, 64, 128, 32)
+    # shape: (?, 256, 32)
 
-    pool1 = tf.keras.layers.MaxPooling2D(
+    pool1 = tf.keras.layers.MaxPooling1D(
         pool_size=8,
         strides=8,
         padding='same')(conv1)
 
-    # shape: (?, 8, 16, 32)
+    # shape: (?, 32, 32)
 
-    conv2 = tf.keras.layers.Conv2D(
+    conv2 = tf.keras.layers.Conv1D(
         filters=32,
         kernel_size=8,
         strides=1,
         padding='same',
         activation=tf.keras.activations.relu)(pool1)
 
-    # shape: (?, 8, 16, 32)
+    # shape: (?, 32, 32)
 
-    pool2 = tf.keras.layers.MaxPooling2D(
+    pool2 = tf.keras.layers.MaxPooling1D(
         pool_size=4,
         strides=4,
         padding='same')(conv2)
 
-    # shape: (?, 2, 4, 32)
+    # shape: (?, 8, 32)
 
     flat = tf.keras.layers.Flatten()(pool2)
 
-    # shape: (?, 2*4*32)
+    # shape: (?, 8*32)
 
     dense = tf.keras.layers.Dense(
         units=1024,
