@@ -14,7 +14,7 @@ def main(unused_argv):
 
     npy_data_dir = TRAINING_DATA_DIR / 'npy'
     cwd_old = os.getcwd()
-    os.chdir(npy_data_dir)
+    os.chdir(str(npy_data_dir))
     train_data = np.load('x_train.npy').astype(np.float32)
     train_labels = np.load('y_train.npy')
     eval_data = np.load('x_test.npy').astype(np.float32)
@@ -34,7 +34,7 @@ def main(unused_argv):
     class_weights = counts[0] / counts
 
     run_config = tf.estimator.RunConfig(
-        model_dir=MODEL_DIR,
+        model_dir=str(MODEL_DIR),
         save_summary_steps=1,
         keep_checkpoint_max=100,
         log_step_count_steps=1,
