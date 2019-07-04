@@ -5,26 +5,60 @@ from config import CNN_INPUT_LENGTH
 
 def cnn_model_fn(features, labels, mode, params):
 
-    input_shape = (-1, CNN_INPUT_LENGTH)
+    input_shape = (-1, CNN_INPUT_LENGTH, 1)
     input_layer = tf.reshape(features['input'], input_shape)
 
-    dense1 = tf.keras.layers.Dense(
-        units=1024,
+    # shape: (?, 1000, 1)
+
+    conv1 = tf.keras.layers.Conv1D(
+        filters=32,
+        kernel_size=16,
+        strides=1,
+        padding='same',
         activation=tf.keras.activations.relu)(input_layer)
 
-    dropout1 = tf.keras.layers.Dropout(rate=0.25)(dense1)
+    # shape: (?, 1000, 32)
 
-    dense2 = tf.keras.layers.Dense(
-        units=512,
-        activation=tf.keras.activations.relu)(dropout1)
+    pool1 = tf.keras.layers.MaxPooling1D(
+        pool_size=8,
+        strides=8,
+        padding='same')(conv1)
 
-    dropout2 = tf.keras.layers.Dropout(rate=0.25)(dense2)
+    # shape: (?, 125, 32)
 
-    dense3 = tf.keras.layers.Dense(
-        units=64,
-        activation=tf.keras.activations.relu)(dropout2)
+    conv2 = tf.keras.layers.Conv1D(
+        filters=32,
+        kernel_size=8,
+        strides=1,
+        padding='same',
+        activation=tf.keras.activations.relu)(pool1)
 
-    logits = tf.keras.layers.Dense(units=2)(dense3)
+    # shape: (?, 125, 32)
+
+    pool2 = tf.keras.layers.MaxPooling1D(
+        pool_size=4,
+        strides=4,
+        padding='same')(conv2)
+
+    # shape: (?, 32, 32)
+
+    flat = tf.keras.layers.Flatten()(pool2)
+
+    # shape: (?, 32*32)
+
+    dense = tf.keras.layers.Dense(
+        units=1024,
+        activation=tf.keras.activations.relu)(flat)
+
+    # shape: (?, 1024)
+
+    dropout = tf.keras.layers.Dropout(rate=0.4)(dense)
+
+    # shape: (?, 1024)
+
+    logits = tf.keras.layers.Dense(units=2)(dropout)
+
+    # shape: (?, 2)
 
     predicted_class = tf.argmax(input=logits, axis=1)
 
@@ -36,6 +70,13 @@ def cnn_model_fn(features, labels, mode, params):
         }
         if params['return_all_layers']:
             prediction_data.update({
+                'conv1': conv1,
+                'pool1': pool1,
+                'conv2': conv2,
+                'pool2': pool2,
+                'flat': flat,
+                'dense': dense,
+                'dropout': dropout,
                 'logits': logits,
             })
         return tf.estimator.EstimatorSpec(mode, prediction_data)
