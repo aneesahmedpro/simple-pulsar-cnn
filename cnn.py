@@ -1,13 +1,15 @@
 import tensorflow as tf
 
 from config import (PHASE_TIME_PLOT_WIDTH, PHASE_TIME_PLOT_HEIGHT,
-                    PHASE_BAND_PLOT_WIDTH, PHASE_BAND_PLOT_HEIGHT)
+                    PHASE_BAND_PLOT_WIDTH, PHASE_BAND_PLOT_HEIGHT,
+                    CHI_VS_DM_PLOT_LENGTH)
 
 
 def cnn_model_fn(features, labels, mode, params):
 
     A_input_shape = (-1, PHASE_TIME_PLOT_HEIGHT, PHASE_TIME_PLOT_WIDTH, 1)
     B_input_shape = (-1, PHASE_BAND_PLOT_HEIGHT, PHASE_BAND_PLOT_WIDTH, 1)
+    D_input_shape = (-1, CHI_VS_DM_PLOT_LENGTH, 1)
 
     A_input = tf.reshape(features['phase_time_plots'], A_input_shape)
 
@@ -89,7 +91,47 @@ def cnn_model_fn(features, labels, mode, params):
 
     # B_shape: (?, 4*4*32)
 
-    flat = tf.keras.layers.Concatenate(axis=1)([A_flat, B_flat])
+    D_input = tf.reshape(features['chi_vs_DM_plots'], D_input_shape)
+
+    # D_shape: (?, 1000, 1)
+
+    D_conv1 = tf.keras.layers.Conv1D(
+        filters=32,
+        kernel_size=16,
+        strides=1,
+        padding='same',
+        activation=tf.keras.activations.relu)(D_input)
+
+    # D_shape: (?, 1000, 32)
+
+    D_pool1 = tf.keras.layers.MaxPooling1D(
+        pool_size=8,
+        strides=8,
+        padding='same')(D_conv1)
+
+    # D_shape: (?, 125, 32)
+
+    D_conv2 = tf.keras.layers.Conv1D(
+        filters=32,
+        kernel_size=8,
+        strides=1,
+        padding='same',
+        activation=tf.keras.activations.relu)(D_pool1)
+
+    # D_shape: (?, 125, 32)
+
+    D_pool2 = tf.keras.layers.MaxPooling1D(
+        pool_size=4,
+        strides=4,
+        padding='same')(D_conv2)
+
+    # D_shape: (?, 32, 32)
+
+    D_flat = tf.keras.layers.Flatten()(D_pool2)
+
+    # D_shape: (?, 32*32)
+
+    flat = tf.keras.layers.Concatenate(axis=1)([A_flat, B_flat, D_flat])
 
     dense = tf.keras.layers.Dense(
         units=1024,
@@ -125,6 +167,11 @@ def cnn_model_fn(features, labels, mode, params):
                 'B_conv2': B_conv2,
                 'B_pool2': B_pool2,
                 'B_flat': B_flat,
+                'D_conv1': D_conv1,
+                'D_pool1': D_pool1,
+                'D_conv2': D_conv2,
+                'D_pool2': D_pool2,
+                'D_flat': D_flat,
                 'flat': flat,
                 'dense': dense,
                 'dropout': dropout,
