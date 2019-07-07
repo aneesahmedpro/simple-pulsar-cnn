@@ -1,50 +1,95 @@
 import tensorflow as tf
 
-from config import CNN_INPUT_IMG_WIDTH, CNN_INPUT_IMG_HEIGHT
+from config import (PHASE_TIME_PLOT_WIDTH, PHASE_TIME_PLOT_HEIGHT,
+                    PHASE_BAND_PLOT_WIDTH, PHASE_BAND_PLOT_HEIGHT)
 
 
 def cnn_model_fn(features, labels, mode, params):
 
-    input_shape = (-1, CNN_INPUT_IMG_HEIGHT, CNN_INPUT_IMG_WIDTH, 1)
-    input_layer = tf.reshape(features['phase_time_plots'], input_shape)
+    A_input_shape = (-1, PHASE_TIME_PLOT_HEIGHT, PHASE_TIME_PLOT_WIDTH, 1)
+    B_input_shape = (-1, PHASE_BAND_PLOT_HEIGHT, PHASE_BAND_PLOT_WIDTH, 1)
 
-    # shape: (?, 64, 128, 1)
+    A_input = tf.reshape(features['phase_time_plots'], A_input_shape)
 
-    conv1 = tf.keras.layers.Conv2D(
+    # A_shape: (?, 64, 128, 1)
+
+    A_conv1 = tf.keras.layers.Conv2D(
         filters=32,
         kernel_size=16,
         strides=1,
         padding='same',
-        activation=tf.keras.activations.relu)(input_layer)
+        activation=tf.keras.activations.relu)(A_input)
 
-    # shape: (?, 64, 128, 32)
+    # A_shape: (?, 64, 128, 32)
 
-    pool1 = tf.keras.layers.MaxPooling2D(
+    A_pool1 = tf.keras.layers.MaxPooling2D(
         pool_size=8,
         strides=8,
-        padding='same')(conv1)
+        padding='same')(A_conv1)
 
-    # shape: (?, 8, 16, 32)
+    # A_shape: (?, 8, 16, 32)
 
-    conv2 = tf.keras.layers.Conv2D(
+    A_conv2 = tf.keras.layers.Conv2D(
         filters=32,
         kernel_size=8,
         strides=1,
         padding='same',
-        activation=tf.keras.activations.relu)(pool1)
+        activation=tf.keras.activations.relu)(A_pool1)
 
-    # shape: (?, 8, 16, 32)
+    # A_shape: (?, 8, 16, 32)
 
-    pool2 = tf.keras.layers.MaxPooling2D(
+    A_pool2 = tf.keras.layers.MaxPooling2D(
         pool_size=4,
         strides=4,
-        padding='same')(conv2)
+        padding='same')(A_conv2)
 
-    # shape: (?, 2, 4, 32)
+    # A_shape: (?, 2, 4, 32)
 
-    flat = tf.keras.layers.Flatten()(pool2)
+    A_flat = tf.keras.layers.Flatten()(A_pool2)
 
-    # shape: (?, 2*4*32)
+    # A_shape: (?, 2*4*32)
+
+    B_input = tf.reshape(features['phase_band_plots'], B_input_shape)
+
+    # B_shape: (?, 128, 128, 1)
+
+    B_conv1 = tf.keras.layers.Conv2D(
+        filters=32,
+        kernel_size=16,
+        strides=1,
+        padding='same',
+        activation=tf.keras.activations.relu)(B_input)
+
+    # B_shape: (?, 128, 128, 32)
+
+    B_pool1 = tf.keras.layers.MaxPooling2D(
+        pool_size=8,
+        strides=8,
+        padding='same')(B_conv1)
+
+    # B_shape: (?, 16, 16, 32)
+
+    B_conv2 = tf.keras.layers.Conv2D(
+        filters=32,
+        kernel_size=8,
+        strides=1,
+        padding='same',
+        activation=tf.keras.activations.relu)(B_pool1)
+
+    # B_shape: (?, 16, 16, 32)
+
+    B_pool2 = tf.keras.layers.MaxPooling2D(
+        pool_size=4,
+        strides=4,
+        padding='same')(B_conv2)
+
+    # B_shape: (?, 4, 4, 32)
+
+    B_flat = tf.keras.layers.Flatten()(B_pool2)
+
+    # B_shape: (?, 4*4*32)
+
+    flat = tf.keras.layers.Concatenate(axis=1)([A_flat, B_flat])
 
     dense = tf.keras.layers.Dense(
         units=1024,
@@ -70,10 +115,16 @@ def cnn_model_fn(features, labels, mode, params):
         }
         if params['return_all_layers']:
             prediction_data.update({
-                'conv1': conv1,
-                'pool1': pool1,
-                'conv2': conv2,
-                'pool2': pool2,
+                'A_conv1': A_conv1,
+                'A_pool1': A_pool1,
+                'A_conv2': A_conv2,
+                'A_pool2': A_pool2,
+                'A_flat': A_flat,
+                'B_conv1': B_conv1,
+                'B_pool1': B_pool1,
+                'B_conv2': B_conv2,
+                'B_pool2': B_pool2,
+                'B_flat': B_flat,
                 'flat': flat,
                 'dense': dense,
                 'dropout': dropout,

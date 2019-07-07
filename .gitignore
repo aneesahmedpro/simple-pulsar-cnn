@@ -1,1 +1,4 @@
 **/__pycache__/
+cnn_tf_model*/*
+training_data/*
+.*/*

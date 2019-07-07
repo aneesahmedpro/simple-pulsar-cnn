@@ -13,9 +13,6 @@ def main(unused_argv):
     data_train = np.load(TRAINING_DATA_DIR/'npy'/'train.npz')
     data_test = np.load(TRAINING_DATA_DIR/'npy'/'test.npz')
 
-    if data_train['phase_time_plots'].dtype != np.float32:
-        print('[WARNING] "phase_time_plots" data must be in "float32" format.')
-
     if len(data_train['labels']) % BATCH_SIZE != 0:
         print('[WARNING] The mini-batch size ({}) is not a divisor '
               'of the total number of training samples ({}).'.format(

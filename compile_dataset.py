@@ -13,22 +13,27 @@ from local_settings import TRAINING_DATA_DIR
 def main(dataset_npz_filepath):
 
     data = np.load(dataset_npz_filepath)
-    x = data['phase_time_plots'].astype(np.float32)
+    x2 = data['phase_band_plots'].astype(np.float32)
+    x1 = data['phase_time_plots'].astype(np.float32)
     y = data['labels']
 
     train_idx, test_idx = stratified_shuffle_split_for_binary(
         y, test_fraction=0.333)
-    x_train = x[train_idx]
+    x1_train = x1[train_idx]
+    x2_train = x2[train_idx]
     y_train = y[train_idx]
-    x_test = x[test_idx]
+    x1_test = x1[test_idx]
+    x2_test = x2[test_idx]
     y_test = y[test_idx]
 
     data_train = {
-        'phase_time_plots': x_train,
+        'phase_time_plots': x1_train,
+        'phase_band_plots': x2_train,
         'labels': y_train,
     }
     data_test = {
-        'phase_time_plots': x_test,
+        'phase_time_plots': x1_test,
+        'phase_band_plots': x2_test,
         'labels': y_test,
     }
 
