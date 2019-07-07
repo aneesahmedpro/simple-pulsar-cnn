@@ -6,7 +6,7 @@ from config import CNN_INPUT_IMG_WIDTH, CNN_INPUT_IMG_HEIGHT
 def cnn_model_fn(features, labels, mode, params):
 
     input_shape = (-1, CNN_INPUT_IMG_HEIGHT, CNN_INPUT_IMG_WIDTH, 1)
-    input_layer = tf.reshape(features['input'], input_shape)
+    input_layer = tf.reshape(features['phase_time_plots'], input_shape)
 
     # shape: (?, 64, 128, 1)
 

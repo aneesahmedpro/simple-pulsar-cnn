@@ -13,19 +13,29 @@ from local_settings import TRAINING_DATA_DIR
 def main(dataset_npz_filepath):
 
     data = np.load(dataset_npz_filepath)
-    x = data['phase_time_plots']
+    x = data['phase_time_plots'].astype(np.float32)
     y = data['labels']
 
-    retval = stratified_shuffle_split_for_binary(x, y, test_fraction=0.333)
-    x_train, y_train, x_test, y_test = retval
+    train_idx, test_idx = stratified_shuffle_split_for_binary(
+        y, test_fraction=0.333)
+    x_train = x[train_idx]
+    y_train = y[train_idx]
+    x_test = x[test_idx]
+    y_test = y[test_idx]
 
-    os.chdir(str(TRAINING_DATA_DIR/'npy'))
-    np.save('x_train.npy', x_train, allow_pickle=False)
-    np.save('y_train.npy', y_train, allow_pickle=False)
-    np.save('x_test.npy', x_test, allow_pickle=False)
-    np.save('y_test.npy', y_test, allow_pickle=False)
+    data_train = {
+        'phase_time_plots': x_train,
+        'labels': y_train,
+    }
+    data_test = {
+        'phase_time_plots': x_test,
+        'labels': y_test,
+    }
 
-    print('Data successfully compiled into npy containers.')
+    np.savez_compressed(TRAINING_DATA_DIR/'npy'/'train.npz', **data_train)
+    np.savez_compressed(TRAINING_DATA_DIR/'npy'/'test.npz', **data_test)
+
+    print('Data successfully compiled into npz containers.')
 
 
 if __name__ == '__main__':
