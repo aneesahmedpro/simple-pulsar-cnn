@@ -13,14 +13,13 @@ def main(dataset_npz_filepath):
 
     data = np.load(dataset_npz_filepath)
 
-    x2 = data['phase_band_plots'].astype(np.float32)
-    x1 = data['phase_time_plots'].astype(np.float32)
-    x3 = data['time_plots'].astype(np.float32)
-    x4 = data['chi_vs_DM_plots'].astype(np.float32)
+    x1 = data['phase_time_plots']
+    x2 = data['phase_band_plots']
+    x3 = data['time_plots']
+    x4 = data['chi_vs_DM_plots']
     y = data['labels']
 
-    train_idx, test_idx = stratified_shuffle_split_for_binary(
-        y, test_fraction=0.333)
+    train_idx, test_idx = stratified_shuffle_split_for_binary(y, 0.333)
 
     x1_train = x1[train_idx]
     x2_train = x2[train_idx]

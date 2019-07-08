@@ -241,7 +241,6 @@ def cnn_model_fn(features, labels, mode, params):
             mode=mode, loss=loss_op, train_op=train_op)
 
     accuracy = tf.metrics.accuracy(labels, predicted_class)
-    rms_error = tf.metrics.root_mean_squared_error(labels, predicted_class)
     true_neg = tf.metrics.true_negatives(labels, predicted_class)
     false_pos = tf.metrics.false_positives(labels, predicted_class)
     false_neg = tf.metrics.false_negatives(labels, predicted_class)
@@ -255,7 +254,6 @@ def cnn_model_fn(features, labels, mode, params):
 
     eval_metric_ops = {
         'accuracy': accuracy,
-        'root_mean_squared_error': rms_error,
         'true_negatives': true_neg,
         'false_positives': false_pos,
         'false_negatives': false_neg,
