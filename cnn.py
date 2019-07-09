@@ -9,7 +9,7 @@ def cnn_model_fn(features, labels, mode, params):
 
     A_input_shape = (-1, PHASE_TIME_PLOT_HEIGHT, PHASE_TIME_PLOT_WIDTH, 1)
     B_input_shape = (-1, PHASE_BAND_PLOT_HEIGHT, PHASE_BAND_PLOT_WIDTH, 1)
-    C_input_shape = (-1, TIME_PLOT_LENGTH, 1)
+    C_input_shape = (-1, 2*TIME_PLOT_LENGTH, 1)
     D_input_shape = (-1, CHI_VS_DM_PLOT_LENGTH, 1)
 
     A_input = tf.reshape(features['phase_time_plots'], A_input_shape)
