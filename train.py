@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+from __future__ import print_function, division
 
 import numpy as np
 import tensorflow as tf
@@ -55,11 +55,14 @@ def main(unused_argv):
 
     while True:
         try:
-            epochs = input('\nHow many more epochs? ')
+            epochs = raw_input('\nHow many more epochs? ')
         except EOFError:
             print('[EOF]\nExiting...')
             break
-        if not epochs:
+        except KeyboardInterrupt:
+            print('[KeyboardInterrupt]\nExiting...')
+            break
+        if not epochs:  # if epochs is an empty string
             epochs = 1
         else:
             try:

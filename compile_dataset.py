@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+from __future__ import print_function
 
 import sys
-import pathlib
+import pathlib2
 
 import numpy as np
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
             '/path/to/dataset_file.npz'))
         exit(1)
 
-    dataset_npz_filepath = pathlib.Path(sys.argv[1]).absolute()
+    dataset_npz_filepath = pathlib2.Path(sys.argv[1]).absolute()
     if not dataset_npz_filepath.exists() or dataset_npz_filepath.is_dir():
         print('Bad path: "{}"'.format(dataset_npz_filepath))
         exit(1)
