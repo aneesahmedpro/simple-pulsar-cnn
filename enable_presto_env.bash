@@ -15,9 +15,3 @@ if [ -z $LD_LIBRARY_PATH ]; then
 else
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PRESTO/lib
 fi
-
-if [ -z $PYTHONPATH ]; then
-    export PYTHONPATH=$PRESTO/lib/python
-else
-    export PYTHONPATH=$PYTHONPATH:$PRESTO/lib/python
-fi

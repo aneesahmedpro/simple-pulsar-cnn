@@ -1,7 +1,5 @@
-from __future__ import print_function
-
 import sys
-import pathlib2
+import pathlib
 import csv
 
 import numpy as np
@@ -22,16 +20,16 @@ def main(dataset_npz_filepath, result_csv_filepath):
         params={'class_weights': None, 'return_all_layers': False},
         model_dir=MODEL_DIR)
 
-    input_fn = tf.estimator.inputs.numpy_input_fn(
+    input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(
         x={k: v for k, v in data.items() if k != 'labels'},
         num_epochs=1,
         shuffle=False)
 
-    tf.logging.set_verbosity(tf.logging.INFO)
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
     output_generator = classifier.predict(input_fn=input_fn)
 
-    with open(str(result_csv_filepath), 'wb') as result_csv_file:
+    with open(str(result_csv_filepath), 'w') as result_csv_file:
         csv_writer = csv.writer(result_csv_file)
         for output, pfd_filepath in zip(output_generator, pfd_filepaths):
             predicted_class_id = output['class']
@@ -52,12 +50,12 @@ if __name__ == '__main__':
             '/path/to/prediction_result.csv'))
         exit(1)
 
-    dataset_npz_filepath = pathlib2.Path(sys.argv[1]).absolute()
+    dataset_npz_filepath = pathlib.Path(sys.argv[1]).absolute()
     if not dataset_npz_filepath.exists() or dataset_npz_filepath.is_dir():
         print('Bad path: "{}"'.format(dataset_npz_filepath))
         exit(1)
 
-    result_csv_filepath = pathlib2.Path(sys.argv[2]).absolute()
+    result_csv_filepath = pathlib.Path(sys.argv[2]).absolute()
     if result_csv_filepath.exists() and result_csv_filepath.is_dir():
         print('Bad path: "{}"'.format(result_csv_filepath))
         exit(1)

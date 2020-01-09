@@ -1,15 +1,13 @@
-from __future__ import print_function, division
-
 import sys
 import subprocess
-import pathlib2
+import pathlib
 import multiprocessing
 import pickle
 
 import numpy as np
 import scipy.stats
-import prepfold
-import psr_utils
+import presto.prepfold as prepfold
+import presto.psr_utils as psr_utils
 
 
 def normalise_2d_rowwise(array2d):
@@ -117,38 +115,37 @@ if __name__ == '__main__':
             '/path/to/dataset_file.pickled'))
         exit(1)
 
-    root_dirpath = pathlib2.Path(sys.argv[1]).absolute()
+    root_dirpath = pathlib.Path(sys.argv[1]).absolute()
     if not root_dirpath.exists() or not root_dirpath.is_dir():
         print('Bad path: "{}"'.format(root_dirpath))
         exit(1)
 
-    dataset_filepath = pathlib2.Path(sys.argv[2]).absolute()
+    dataset_filepath = pathlib.Path(sys.argv[2]).absolute()
     if dataset_filepath.exists() and dataset_filepath.is_dir():
         print('Bad path: "{}"'.format(dataset_filepath))
         exit(1)
 
     with open(str(dataset_filepath), 'wb') as f:
-        f.write('Just testing writability...')
+        f.write(b'Just testing writability...')
 
-    sys.stdout.write('\nCollecting ".pfd" files... ')
-    sys.stdout.flush()
+    print('\nCollecting ".pfd" files... ', end='', flush=True)
 
     try:
         cmd = ['find', str(root_dirpath), '-name', '*.pfd']
-        pfd_filepaths_str = subprocess.check_output(cmd)
+        pfd_filepaths_str = subprocess.check_output(cmd).decode()
     except:
         print('Failed to execute: "{}"'.format(' '.join(cmd)))
         exit(1)
 
     if pfd_filepaths_str:
         pfd_filepaths = pfd_filepaths_str.strip().split('\n')
-        pfd_filepaths = [pathlib2.Path(x) for x in pfd_filepaths]
+        pfd_filepaths = [pathlib.Path(x) for x in pfd_filepaths]
         print('Done. Found {}.'.format(len(pfd_filepaths)))
     else:
         print('Done. Failed to find any.')
         exit(1)
 
-    # import random; pfd_filepaths = random.sample(pfd_filepaths, 4)
+    # import random; pfd_filepaths = random.sample(pfd_filepaths, 8)
 
     print('\nExtracting features...')
 
@@ -161,8 +158,7 @@ if __name__ == '__main__':
 
     for result in results:
         result.wait()
-        sys.stdout.write('#')
-        sys.stdout.flush()
+        print('#', end='', flush=True)
 
     print('\nDone.')
 
@@ -189,8 +185,7 @@ if __name__ == '__main__':
 
     pfd_filepaths = [str(p.relative_to(root_dirpath)) for p in pfd_filepaths]
 
-    sys.stdout.write('\nWriting to disk... ')
-    sys.stdout.flush()
+    print('\nWriting to disk... ', end='', flush=True)
 
     data = {
         'stats': stats,

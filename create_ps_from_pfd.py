@@ -1,9 +1,7 @@
-from __future__ import print_function
-
 import sys
 import os
 import subprocess
-import pathlib2
+import pathlib
 import multiprocessing
 
 
@@ -31,21 +29,21 @@ if __name__ == '__main__':
                   sys.argv[0]))
         exit(1)
 
-    root_dirpath = pathlib2.Path(sys.argv[1]).absolute()
+    root_dirpath = pathlib.Path(sys.argv[1]).absolute()
     if not root_dirpath.exists() or not root_dirpath.is_dir():
         print('Bad path: "{}"'.format(root_dirpath))
         exit(1)
 
     try:
         cmd = ['find', str(root_dirpath), '-name', '*.pfd']
-        pfd_filepaths_str = subprocess.check_output(cmd)
+        pfd_filepaths_str = subprocess.check_output(cmd).decode()
     except subprocess.CalledProcessError:
         print('Failed to execute: "{}"'.format(' '.join(cmd)))
         exit(1)
 
     if pfd_filepaths_str:
         pfd_filepaths = pfd_filepaths_str.strip().split('\n')
-        pfd_filepaths = [pathlib2.Path(x) for x in pfd_filepaths]
+        pfd_filepaths = [pathlib.Path(x) for x in pfd_filepaths]
         print('Found {} PFDs.\n'.format(len(pfd_filepaths)))
     else:
         print('Failed to find any PFDs.\n')

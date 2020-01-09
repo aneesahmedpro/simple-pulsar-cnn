@@ -1,9 +1,7 @@
-from __future__ import print_function
-
 import numpy as np
 import pickle
 import sys
-import pathlib2
+import pathlib
 
 from config import (PHASE_TIME_PLOT_WIDTH, PHASE_TIME_PLOT_HEIGHT,
                     PHASE_BAND_PLOT_WIDTH, PHASE_BAND_PLOT_HEIGHT,
@@ -11,6 +9,8 @@ from config import (PHASE_TIME_PLOT_WIDTH, PHASE_TIME_PLOT_HEIGHT,
 
 
 def main(dataset_pickled_filepath, dataset_npz_filepath):
+
+    print('Filtering... ', end='', flush=True)
 
     with open(str(dataset_pickled_filepath), 'rb') as f:
         data = pickle.load(f)
@@ -30,6 +30,8 @@ def main(dataset_pickled_filepath, dataset_npz_filepath):
     new_chi_vs_DM_plots_lengths = []
     new_labels = []
     new_pfd_filepaths = []
+
+    count_accepted = 0
 
     for i in range(len(labels)):
 
@@ -57,6 +59,8 @@ def main(dataset_pickled_filepath, dataset_npz_filepath):
         new_labels.append(labels[i])
         new_pfd_filepaths.append(pfd_filepaths[i])
 
+        count_accepted += 1
+
     new_stats = np.array(new_stats).astype(np.float32)
     new_time_plots = np.array(new_time_plots).astype(np.float32)
     new_phase_time_plots = np.array(new_phase_time_plots).astype(np.float32)
@@ -66,6 +70,10 @@ def main(dataset_pickled_filepath, dataset_npz_filepath):
         new_chi_vs_DM_plots_lengths).astype(np.int)
     labels = np.array(labels).astype(np.int)
     pfd_filepaths = np.array(pfd_filepaths)
+
+    print(count_accepted, 'accepted.')
+
+    print('\nWriting to disk... ', end='', flush=True)
 
     data = {
         'stats': new_stats,
@@ -91,17 +99,17 @@ if __name__ == '__main__':
             '/path/to/dataset_file.npz'))
         exit(1)
 
-    dataset_pickled_filepath = pathlib2.Path(sys.argv[1]).absolute()
+    dataset_pickled_filepath = pathlib.Path(sys.argv[1]).absolute()
     if dataset_pickled_filepath.exists() and dataset_pickled_filepath.is_dir():
         print('Bad path: "{}"'.format(dataset_pickled_filepath))
         exit(1)
 
-    dataset_npz_filepath = pathlib2.Path(sys.argv[2]).absolute()
+    dataset_npz_filepath = pathlib.Path(sys.argv[2]).absolute()
     if dataset_npz_filepath.exists() and dataset_npz_filepath.is_dir():
         print('Bad path: "{}"'.format(dataset_npz_filepath))
         exit(1)
 
-    with open(str(dataset_npz_filepath), 'w') as f:
-        f.write('Just testing writability...')
+    with open(str(dataset_npz_filepath), 'wb') as f:
+        f.write(b'Just testing writability...')
 
     main(dataset_pickled_filepath, dataset_npz_filepath)

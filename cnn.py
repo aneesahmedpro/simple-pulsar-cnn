@@ -230,26 +230,27 @@ def cnn_model_fn(features, labels, mode, params):
 
     weights = tf.gather(class_weights, labels)
 
-    loss_op = tf.losses.sparse_softmax_cross_entropy(labels, logits, weights)
+    loss_op = tf.compat.v1.losses.sparse_softmax_cross_entropy(
+        labels, logits, weights)
 
     if mode == tf.estimator.ModeKeys.TRAIN:
-        optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+        optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=0.001)
         train_op = optimizer.minimize(
             loss=loss_op,
-            global_step=tf.train.get_global_step())
+            global_step=tf.compat.v1.train.get_global_step())
         return tf.estimator.EstimatorSpec(
             mode=mode, loss=loss_op, train_op=train_op)
 
-    accuracy = tf.metrics.accuracy(labels, predicted_class)
-    true_neg = tf.metrics.true_negatives(labels, predicted_class)
-    false_pos = tf.metrics.false_positives(labels, predicted_class)
-    false_neg = tf.metrics.false_negatives(labels, predicted_class)
-    true_pos = tf.metrics.true_positives(labels, predicted_class)
+    accuracy = tf.compat.v1.metrics.accuracy(labels, predicted_class)
+    true_neg = tf.compat.v1.metrics.true_negatives(labels, predicted_class)
+    false_pos = tf.compat.v1.metrics.false_positives(labels, predicted_class)
+    false_neg = tf.compat.v1.metrics.false_negatives(labels, predicted_class)
+    true_pos = tf.compat.v1.metrics.true_positives(labels, predicted_class)
 
     mask_for_pos = tf.equal(labels, 1)
-    precision_for_pos = tf.metrics.precision(
+    precision_for_pos = tf.compat.v1.metrics.precision(
         labels, predicted_class, weights=mask_for_pos)
-    recall_for_pos = tf.metrics.recall(
+    recall_for_pos = tf.compat.v1.metrics.recall(
         labels, predicted_class, weights=mask_for_pos)
 
     eval_metric_ops = {

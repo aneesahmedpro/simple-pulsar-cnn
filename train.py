@@ -1,5 +1,3 @@
-from __future__ import print_function, division
-
 import numpy as np
 import tensorflow as tf
 
@@ -37,25 +35,25 @@ def main(unused_argv):
         params={'class_weights': class_weights, 'return_all_layers': False},
         config=run_config)
 
-    train_input_fn = tf.estimator.inputs.numpy_input_fn(
+    train_input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(
         x={k: v for k, v in data_train.items() if k != 'labels'},
         y=data_train['labels'],
         batch_size=BATCH_SIZE,
         num_epochs=None,
         shuffle=True)
 
-    eval_input_fn = tf.estimator.inputs.numpy_input_fn(
+    eval_input_fn = tf.compat.v1.estimator.inputs.numpy_input_fn(
         x={k: v for k, v in data_test.items() if k != 'labels'},
         y=data_test['labels'],
         # batch_size=len(eval_data),  # Might eat up all RAM and freeze system
         num_epochs=1,
         shuffle=False)
 
-    tf.logging.set_verbosity(tf.logging.INFO)
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
     while True:
         try:
-            epochs = raw_input('\nHow many more epochs? ')
+            epochs = input('\nHow many more epochs? ')
         except EOFError:
             print('[EOF]\nExiting...')
             break
@@ -81,4 +79,4 @@ def main(unused_argv):
 
 if __name__ == '__main__':
 
-    tf.app.run()
+    tf.compat.v1.app.run()

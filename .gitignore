@@ -1,6 +1,6 @@
 **/__pycache__/
 *.pyc
-virtualenv/*
+venv/*
 cnn_tf_model*/*
 training_data/*
 .*/*

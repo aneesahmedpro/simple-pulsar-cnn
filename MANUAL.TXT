@@ -13,53 +13,71 @@ SETUP
 1)  Use a GNU/Linux system (preferebly, Ubuntu).
 
 
-2)  Make sure Python v2.7 is installed on the system.
+2)  Make sure Python v3.6 or higher is installed on the system.
 
-    Run "python --version" to check.
+    Run "python --version" to check the version installed on your system.
 
-    If multiple Python versions are installed, use "python2.7" instead of
-    "python" to be specific.
+    If multiple Python versions are installed, use the correct version-specific
+    executable, e.g. "python3" or "python3.6".
+
+    From here onwards, all commands are written assuming the executable for
+    python is "python3".
 
 
 3)  Install PRESTO (https://www.cv.nrao.edu/~sransom/presto/).
+
+    NOTE: Do not perform the final step of integrating PRESTO with Python by
+          installing the Python routines. You'll mostly probably end up using
+          "sudo pip install" which will pollute the system-wide Python
+          installation by putting PRESTO routines into it.
+
+          We will perform this step later so that we can put the PRESTO
+          routines into a project-specific virtual environment.
+
+          The step 12 will take care of this specifically.
 
     It is recommended to use the system package manager wherever possible to
     install a package which contains the dependency required by PRESTO.
 
     Make sure to set up all the global variables carefully.
 
-    It is discouraged to parmanently modify the global variables. It is
-    recommended that a shell script be created instead which sets these
-    variables up temporarily for a shell session. For example, see the Bash
-    script "enable_presto_env.bash", it assumes PRESTO and TEMPO were installed
-    in "/opt/" and other dependencies (e.g. PGPLOT) were installed in standard
-    paths by using the system package manager, specifically APT on Ubuntu.
+    NOTE: It is discouraged to parmanently modify the global variables. It is
+          recommended that a shell script be created instead which sets these
+          variables up temporarily for a shell session. For example, see the
+          Bash script "enable_presto_env.bash", it assumes PRESTO and TEMPO
+          were installed in "/opt/" and other dependencies (e.g. PGPLOT) were
+          installed in standard paths by using APT on Ubuntu.
+
+          Then, everytime PRESTO needs to be used, this script will be sourced
+          into the session so that all global variables are correctly set up.
 
 
 4)  From here onwards, all commands are written assuming the current working
-    directory is the main project folder.
+    directory is the main project folder, unless explicitly stated otherwise.
+
+    So, set the current working directory to the project top directory.
 
     For example, in Bash, use "cd" command to change the current working
     directory.
 
 
-5)  Install "virtualenv" (https://virtualenv.pypa.io/en/latest/).
+5)  Install "venv", the official virtual environments module of Python.
 
-    It is discouraged to use "pip" for installing "virtualenv", as it can break
-    the system. It is recommended to use the system package manager to install
-    a package which contains "virtualenv".
+    It should be installed on the system by default if you have Python already
+    installed, but some distributions, e.g. Ubuntu repositories, make this
+    module a separate package. You need to separately install it in that case.
 
-    On Ubuntu, run "sudo apt install virtualenv"
+    On Ubuntu, run "sudo apt install python3-venv".
 
 
 6)  Create a virtual environment just inside the main project folder.
 
-    Run "virtualenv -p python2.7 virtualenv".
+    Run "python3 -m venv venv".
 
 
 7)  Activate the virtual environment for the current shell session.
 
-    Run "source virtualenv/bin/activate".
+    Run "source venv/bin/activate".
 
 
 8)  Run the shell script which sets the global variables up for the current
@@ -74,17 +92,31 @@ SETUP
     Run "show_pfd" to check.
 
 
-10) Install the required Python packages into the virtual environment,
+10) Install developer files for Python, according to your distribution.
+
+    This will be required to integrate PRESTO with Python by installing the
+    "presto" package into Python.
+
+    On Ubuntu, run "sudo apt install python3-dev".
+
+
+11) Install the required Python packages into the virtual environment,
     using the "requirements.txt" file.
 
-    Run "pip install -r requirements.txt".
+    Run "pip3 install -r requirements.txt".
 
 
-11) Make sure the required Python packages are installed correctly.
+12) Now integrate PRESTO with Python.
 
-    To check, run "python" to launch the Python interpreter, and then type in
-    "import tensorflow" and press Enter key. Also check more by trying
-    "import numpy" and "import pathlib2".
+    For this, you'd most probably need to do "cd $PRESTO ; pip install ." but
+    check the PRESTO install instructions for latest instructions.
+
+    This will put "presto" python module into the virtual environment and not
+    the system-wide Python installation.
+
+
+13) Run the PRESTO Python tests afterwards to make sure "presto" module is
+    working.
 
 
 
@@ -95,7 +127,7 @@ TRAIN
 
 1)  Activate the virtual environment for the current shell session.
 
-    Run "source virtualenv/bin/activate".
+    Run "source venv/bin/activate".
 
 
 2)  Run the shell script which sets the global variables up for the current
@@ -110,7 +142,7 @@ TRAIN
     The relative heirarchy of the PFD files inside the dataset folder doesn't
     matter. For every "abc.pfd", a "abc.ps" will be created in the same folder.
 
-    Run "python create_ps_from_pfd.py /path/to/data_dir".
+    Run "python3 create_ps_from_pfd.py /path/to/data_dir".
 
 
 4)  Arrange PFD files by moving every PFD file into an either "positive" or
@@ -138,7 +170,7 @@ TRAIN
 
     See "https://docs.python.org/2/library/pickle.html" to learn more.
 
-    Run "python create_dataset.py /path/to/data_dir /path/to/dataset.pickled".
+    Run "python3 create_dataset.py /path/to/data_dir /path/to/dataset.pickled".
 
 
 6)  Filter out those samples form PICKLED file and store them into a NPZ file,
@@ -153,7 +185,7 @@ TRAIN
     to learn more.
 
     Run
-    "python pickled_to_npz.py /path/to/dataset.pickled /path/to/dataset.npz".
+    "python3 pickled_to_npz.py /path/to/dataset.pickled /path/to/dataset.npz".
 
 
 7)  Divide the samples in NPZ file into 'test' and 'train' and store them into
@@ -162,7 +194,7 @@ TRAIN
     Samples are automatically stored into "training_data/npy/train.npz" and
     "training_data/npy/test.npz", using a 33% split fraction for 'test'.
 
-    Run "python compile_dataset.py /path/to/dataset.npz".
+    Run "python3 compile_dataset.py /path/to/dataset.npz".
 
 
 8)  Start the training the Neural Network.
@@ -172,7 +204,7 @@ TRAIN
 
     The trained weigths are stored in a "cnn_tf_model" named folder.
 
-    Run "python train.py", and enter the required number of epochs to train,
+    Run "python3 train.py", and enter the required number of epochs to train,
     enter "0" to stop training and quit.
 
 
@@ -184,7 +216,7 @@ PREDICT
 
 1)  Activate the virtual environment for the current shell session.
 
-    Run "source virtualenv/bin/activate".
+    Run "source venv/bin/activate".
 
 
 2)  Run the shell script which sets the global variables up for the current
@@ -200,13 +232,13 @@ PREDICT
 
     The relative heirarchy of the PFD files inside the folder doesn't matter.
 
-    Run "python create_dataset.py /path/to/unseen_data_dir /path/to/unseen_dataset.pickled".
+    Run "python3 create_dataset.py /path/to/unseen_data_dir /path/to/unseen_dataset.pickled".
 
 
 4)  Filter out those samples form PICKLED file and store them into a NPZ file,
     which are compatible with the Neural Network.
 
-    Run "python pickled_to_npz.py /path/to/unseen_dataset.pickled /path/to/unseen_dataset.npz".
+    Run "python3 pickled_to_npz.py /path/to/unseen_dataset.pickled /path/to/unseen_dataset.npz".
 
 
 5)  Feed the samples to the Neural Network and save the predicion results into
@@ -218,4 +250,4 @@ PREDICT
 
     A lot of popular spreadsheet softwares can also import CSV data.
 
-    Run "python predict.py /path/to/unseen_dataset.npz /path/to/prediction_result.csv".
+    Run "python3 predict.py /path/to/unseen_dataset.npz /path/to/prediction_result.csv".

@@ -1,4 +1,4 @@
-import pathlib2
+import pathlib
 
 # ----------------- DON'T TOUCH ANYTHING ABOVE THIS LINE ----------------------
 
@@ -14,7 +14,7 @@ TRAINING_DATA_DIR = 'training_data'
 
 # ----------------- DON'T TOUCH ANYTHING BELOW THIS LINE ----------------------
 
-PROJECT_DIR = pathlib2.Path(__file__).absolute().parent
+PROJECT_DIR = pathlib.Path(__file__).absolute().parent
 
 MODEL_DIR = PROJECT_DIR / MODEL_DIR
 TRAINING_DATA_DIR = PROJECT_DIR / TRAINING_DATA_DIR
