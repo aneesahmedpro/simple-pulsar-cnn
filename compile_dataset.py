@@ -4,10 +4,13 @@ import pathlib
 import numpy as np
 
 from stratified_shuffle_split import stratified_shuffle_split_for_binary
+from config import CLASS_ID_TO_LABEL
 from local_settings import TRAINING_DATA_DIR
 
 
 def main(dataset_npz_filepath):
+
+    print('Processing...')
 
     data = np.load(dataset_npz_filepath)
 
@@ -16,6 +19,18 @@ def main(dataset_npz_filepath):
     x3 = data['time_plots']
     x4 = data['chi_vs_DM_plots']
     y = data['labels']
+
+    # Remove any example which is labelled neither positive nor negative
+    idx_to_reject = []
+    valid_labels = CLASS_ID_TO_LABEL.keys()
+    for idx, label in enumerate(y):
+        if label not in valid_labels:
+            idx_to_reject.append(idx)
+    x1 = np.array([a for i, a in enumerate(x1) if i not in idx_to_reject])
+    x2 = np.array([a for i, a in enumerate(x2) if i not in idx_to_reject])
+    x3 = np.array([a for i, a in enumerate(x3) if i not in idx_to_reject])
+    x4 = np.array([a for i, a in enumerate(x4) if i not in idx_to_reject])
+    y = np.array([a for i, a in enumerate(y) if i not in idx_to_reject])
 
     train_idx, test_idx = stratified_shuffle_split_for_binary(y, 0.333)
 
@@ -50,6 +65,8 @@ def main(dataset_npz_filepath):
     np.savez_compressed(TRAINING_DATA_DIR/'npy'/'test.npz', **data_test)
 
     print('Data successfully compiled into npz containers.')
+    print('Examples in Train Dataset:', len(y_train))
+    print('Examples in Test Dataset:', len(y_test))
 
 
 if __name__ == '__main__':

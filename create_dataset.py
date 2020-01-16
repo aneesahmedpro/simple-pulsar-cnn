@@ -38,9 +38,8 @@ def calc_features_from_pfd(pfd_filepath):
     elif pfd_filepath.parent.name == 'negative':
         label = 0
     else:
+        # return (-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, [], [[]], [[]], [])
         label = -1
-        # raise RuntimeError('unable to decide the label of pfd file: {}'.format(
-        #     str(pfd_filepath)))
 
     pfd_data.dedisperse()
 
