@@ -38,8 +38,10 @@ def calc_features_from_pfd(pfd_filepath):
     elif pfd_filepath.parent.name == 'negative':
         label = 0
     else:
-        # return (-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, [], [[]], [[]], [])
         label = -1
+        # return (label, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        #     np.empty(shape=(0,)), np.empty(shape=(0,0)),
+        #     np.empty(shape=(0,0)), np.empty(shape=(0,)))
 
     pfd_data.dedisperse()
 
