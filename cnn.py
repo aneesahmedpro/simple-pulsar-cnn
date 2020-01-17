@@ -247,11 +247,13 @@ def cnn_model_fn(features, labels, mode, params):
     false_neg = tf.compat.v1.metrics.false_negatives(labels, predicted_class)
     true_pos = tf.compat.v1.metrics.true_positives(labels, predicted_class)
 
-    mask_for_pos = tf.equal(labels, 1)
+    mask = tf.equal(predicted_class, 1)
     precision_for_pos = tf.compat.v1.metrics.precision(
-        labels, predicted_class, weights=mask_for_pos)
+        labels, predicted_class, weights=mask)
+
+    mask = tf.equal(labels, 1)
     recall_for_pos = tf.compat.v1.metrics.recall(
-        labels, predicted_class, weights=mask_for_pos)
+        labels, predicted_class, weights=mask)
 
     eval_metric_ops = {
         'accuracy': accuracy,
