@@ -10,8 +10,13 @@ def stratified_shuffle_split_for_binary(labels, test_fraction=0.25):
         else:
             neg.append(i)
 
-    pos_test_samples_count = int(test_fraction * len(pos))
-    neg_test_samples_count = int(test_fraction * len(neg))
+    if len(pos) < 2:
+        raise RuntimeError('Bad dataset: Too few positive examples.')
+    if len(neg) < 2:
+        raise RuntimeError('Bad dataset: Too few negative examples.')
+
+    pos_test_samples_count = max(1, int(test_fraction * len(pos)))
+    neg_test_samples_count = max(1, int(test_fraction * len(neg)))
 
     np.random.shuffle(pos)
     np.random.shuffle(neg)
@@ -29,18 +34,22 @@ def stratified_shuffle_split_for_binary(labels, test_fraction=0.25):
 
 def example():
 
+    count_neg = 80
+    count_pos = 20
+
     x = []
-    for i in range(80):
+    for i in range(count_neg):
         x.append('N_{}'.format(i))
-    for i in range(20):
+    for i in range(count_pos):
         x.append('Y_{}'.format(i))
     x = np.array(x)
 
-    y = np.concatenate([np.full(80, fill_value=0), np.full(20, fill_value=1)])
+    y = np.concatenate(
+        [np.full(count_neg, fill_value=0), np.full(count_pos, fill_value=1)])
 
-    # shuffled_idx = np.random.permutation(80+20)
-    # x = x[shuffled_idx]
-    # y = y[shuffled_idx]
+    shuffled_idx = np.random.permutation(count_pos+count_neg)
+    x = x[shuffled_idx]
+    y = y[shuffled_idx]
 
     print(x, len(x))
     print(y, len(y))
