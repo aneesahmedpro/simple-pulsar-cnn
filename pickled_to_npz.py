@@ -14,7 +14,6 @@ def main(dataset_pickled_filepath, dataset_npz_filepath):
 
     with open(str(dataset_pickled_filepath), 'rb') as f:
         data = pickle.load(f)
-    stats = data['stats']
     time_plots = data['time_plots']
     phase_time_plots = data['phase_time_plots']
     phase_band_plots = data['phase_band_plots']
@@ -22,7 +21,6 @@ def main(dataset_pickled_filepath, dataset_npz_filepath):
     labels = data['labels']
     pfd_filepaths = data['pfd_filepaths']
 
-    new_stats = []
     new_time_plots = []
     new_phase_time_plots = []
     new_phase_band_plots = []
@@ -50,7 +48,6 @@ def main(dataset_pickled_filepath, dataset_npz_filepath):
         # Repeat the plot once to concatenate the spikes split by the edge
         time_plots[i] = np.hstack([time_plots[i], time_plots[i]])
 
-        new_stats.append(stats[i])
         new_time_plots.append(time_plots[i])
         new_phase_time_plots.append(phase_time_plots[i])
         new_phase_band_plots.append(phase_band_plots[i])
@@ -61,7 +58,6 @@ def main(dataset_pickled_filepath, dataset_npz_filepath):
 
         count_accepted += 1
 
-    new_stats = np.array(new_stats).astype(np.float32)
     new_time_plots = np.array(new_time_plots).astype(np.float32)
     new_phase_time_plots = np.array(new_phase_time_plots).astype(np.float32)
     new_phase_band_plots = np.array(new_phase_band_plots).astype(np.float32)
@@ -76,7 +72,6 @@ def main(dataset_pickled_filepath, dataset_npz_filepath):
     print('\nWriting to disk... ', end='', flush=True)
 
     data = {
-        'stats': new_stats,
         'time_plots': new_time_plots,
         'phase_time_plots': new_phase_time_plots,
         'phase_band_plots': new_phase_band_plots,
