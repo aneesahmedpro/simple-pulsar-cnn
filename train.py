@@ -18,6 +18,10 @@ def main(unused_argv):
 
     steps_per_epoch = len(data_train['labels']) // BATCH_SIZE
 
+    if not steps_per_epoch:
+        print('ERROR: Dataset size is itself smaller that mini-batch size.')
+        exit(1)
+
     # Labels are integers from set {0, 1}.
     # Samples with label '1' are fewer than those with label '0'.
     counts = np.bincount(data_train['labels']).astype(np.float)
@@ -49,6 +53,7 @@ def main(unused_argv):
         num_epochs=1,
         shuffle=False)
 
+    print()
     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
     while True:
