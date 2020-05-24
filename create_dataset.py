@@ -5,7 +5,6 @@ import multiprocessing
 import pickle
 
 import numpy as np
-import scipy.stats
 import presto.prepfold as prepfold
 import presto.psr_utils as psr_utils
 
@@ -50,11 +49,6 @@ def calc_features_from_pfd(pfd_filepath):
     profile = normalise_1d(profile)
     ####
 
-    profile_mean = np.mean(profile)
-    profile_std_dev = np.std(profile)
-    profile_skewness = scipy.stats.skew(profile)
-    profile_excess_kurtosis = scipy.stats.kurtosis(profile)
-
     profiles_sum_axis0 = pfd_data.profs.sum(0)
 
     #### As done in: prepfold.pfd.plot_chi2_vs_DM
@@ -78,19 +72,13 @@ def calc_features_from_pfd(pfd_filepath):
         chis[ii] = pfd_data.calc_redchi2(prof=sumprof, avg=pfd_data.avgprof)
     ####
 
-    best_dm = pfd_data.bestdm
-
+    # best_dm = pfd_data.bestdm
     # crop_radius = 100
     # best_dm_index = np.searchsorted(DMs, best_dm)  # Not accurate, but close.
     # bloated_chis = np.insert(chis, N, np.full(crop_radius, chis[-1]))
     # bloated_chis = np.insert(bloated_chis, 0, np.full(crop_radius, chis[0]))
     # cropped_chis = bloated_chis[ best_dm_index : best_dm_index+2*crop_radius ]
     # chis = cropped_chis
-
-    chis_mean = np.mean(chis)
-    chis_std_dev = np.std(chis)
-    chis_skewness = scipy.stats.skew(chis)
-    chis_excess_kurtosis = scipy.stats.kurtosis(chis)
 
     #### As done in: prepfold.pfd.plot_intervals
     intervals = pfd_data.profs.sum(1)
@@ -102,9 +90,7 @@ def calc_features_from_pfd(pfd_filepath):
     subbands = normalise_2d_rowwise(subbands)
     ####
 
-    return (label, profile_mean, profile_std_dev, profile_skewness,
-        profile_excess_kurtosis, chis_mean, chis_std_dev, chis_skewness,
-        chis_excess_kurtosis, best_dm, profile, intervals, subbands, chis)
+    return label, profile, intervals, subbands, chis
 
 
 if __name__ == '__main__':
@@ -146,7 +132,7 @@ if __name__ == '__main__':
         print('Done. Failed to find any.')
         exit(1)
 
-    # import random; pfd_filepaths = random.sample(pfd_filepaths, 8)
+    # import random; pfd_filepaths = random.sample(pfd_filepaths, 8)  # For quick testing
 
     print('\nExtracting features...')
 
@@ -163,21 +149,13 @@ if __name__ == '__main__':
 
     print('\nDone.')
 
-    stats = []
     time_plots = []
     phase_time_plots = []
     phase_band_plots = []
     chi_vs_DM_plots = []
     labels = []
     for result in results:
-        (label, profile_mean, profile_std_dev, profile_skewness,
-            profile_excess_kurtosis, chis_mean, chis_std_dev,
-            chis_skewness, chis_excess_kurtosis, best_dm, profile,
-            intervals, subbands, chis) = result.get()
-        stats.append([
-            profile_mean, profile_std_dev, profile_skewness,
-            profile_excess_kurtosis, chis_mean, chis_std_dev, chis_skewness,
-            chis_excess_kurtosis, best_dm])
+        label, profile, intervals, subbands, chis = result.get()
         time_plots.append(profile)
         phase_time_plots.append(intervals)
         phase_band_plots.append(subbands)
@@ -189,7 +167,6 @@ if __name__ == '__main__':
     print('\nWriting to disk... ', end='', flush=True)
 
     data = {
-        'stats': stats,
         'time_plots': time_plots,
         'phase_time_plots': phase_time_plots,
         'phase_band_plots': phase_band_plots,
